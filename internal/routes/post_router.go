@@ -17,13 +17,13 @@ func RouterPost() http.Handler {
 }
 
 func create(w http.ResponseWriter, r *http.Request) {
-
+	//TODO
 }
 
 func get(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("buscando posts"))
+	//TODO
 }
 
 func update(w http.ResponseWriter, r *http.Request) {
-
+	//TODO
 }
