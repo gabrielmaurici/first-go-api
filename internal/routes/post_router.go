@@ -1,29 +1,47 @@
 package routes
 
 import (
+	"encoding/json"
+	"gabrielmaurici/first-go-api/internal/usecase"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 )
 
-func RouterPost() http.Handler {
+type RouterPost struct {
+	PostUsecase usecase.PostUseCase
+}
+
+func NewRouterPost(postUsecase *usecase.PostUseCase) *RouterPost {
+	return &RouterPost{
+		PostUsecase: *postUsecase,
+	}
+}
+
+func (rp *RouterPost) AddHandlerPost() http.Handler {
 	r := chi.NewRouter()
 
-	r.Post("/", create)
-	r.Get("/", get)
-	r.Put("/", update)
+	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+		var dto usecase.PostInputDto
+
+		err := json.NewDecoder(r.Body).Decode(&dto)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+
+		rp.PostUsecase.Create(dto)
+	})
+
+	r.Get("/", Get)
+	r.Put("/", Update)
 
 	return r
 }
 
-func create(w http.ResponseWriter, r *http.Request) {
+func Get(w http.ResponseWriter, r *http.Request) {
 	//TODO
 }
 
-func get(w http.ResponseWriter, r *http.Request) {
-	//TODO
-}
-
-func update(w http.ResponseWriter, r *http.Request) {
+func Update(w http.ResponseWriter, r *http.Request) {
 	//TODO
 }
