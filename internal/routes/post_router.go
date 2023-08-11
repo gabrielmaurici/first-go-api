@@ -67,7 +67,7 @@ func Create(rp *RouterPost, r *http.Request) error {
 func Get(rp *RouterPost, r *http.Request) ([]byte, error) {
 	id := chi.URLParam(r, "id")
 
-	post, err := rp.PostUsecase.Get(id)
+	post, err := rp.PostUsecase.Get(&id)
 	if err != nil {
 		return nil, err
 	}

@@ -26,12 +26,15 @@ func (uc *PostUseCase) Create(input PostInputDto) error {
 		return err
 	}
 
-	uc.PostGateway.Save(post)
+	err = uc.PostGateway.Save(post)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (uc *PostUseCase) Get(id string) (*entity.Post, error) {
+func (uc *PostUseCase) Get(id *string) (*entity.Post, error) {
 	post, err := uc.PostGateway.Get(id)
 	if err != nil {
 		return nil, err

@@ -15,7 +15,7 @@ func NewPostDb(db *sql.DB) *PostDb {
 	}
 }
 
-func (p *PostDb) Get(id string) (*entity.Post, error) {
+func (p *PostDb) Get(id *string) (*entity.Post, error) {
 	post := &entity.Post{}
 
 	stmt, err := p.DB.Prepare("SELECT id, title, body from posts where id = ?")
@@ -26,7 +26,7 @@ func (p *PostDb) Get(id string) (*entity.Post, error) {
 	defer stmt.Close()
 
 	row := stmt.QueryRow(id)
-	if err := row.Scan(post.Id, post.Title, post.Body); err != nil {
+	if err := row.Scan(&post.Id, &post.Title, &post.Body); err != nil {
 		return nil, err
 	}
 
@@ -34,7 +34,7 @@ func (p *PostDb) Get(id string) (*entity.Post, error) {
 }
 
 func (p *PostDb) Save(post *entity.Post) error {
-	stmt, err := p.DB.Prepare("INSERT INTO posts(id, title, body) VALEUS(?, ?, ?)")
+	stmt, err := p.DB.Prepare("INSERT INTO posts(id, title, body) VALUES(?, ?, ?)")
 	if err != nil {
 		return err
 	}
