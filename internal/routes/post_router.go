@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"errors"
 	"gabrielmaurici/first-go-api/internal/usecase"
 	"net/http"
 
@@ -43,7 +44,17 @@ func (rp *RouterPost) AddHandlerPost() http.Handler {
 		w.Write(post)
 	})
 
-	r.Put("/", Update)
+	r.Put("/", func(w http.ResponseWriter, r *http.Request) {
+		post, err := Update(rp, r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+
+		w.Header().Add("Content-Type", "json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(post)
+	})
 
 	return r
 }
@@ -56,7 +67,7 @@ func Create(rp *RouterPost, r *http.Request) error {
 		return err
 	}
 
-	err = rp.PostUsecase.Create(dto)
+	err = rp.PostUsecase.Create(&dto)
 	if err != nil {
 		return err
 	}
@@ -66,6 +77,9 @@ func Create(rp *RouterPost, r *http.Request) error {
 
 func Get(rp *RouterPost, r *http.Request) ([]byte, error) {
 	id := chi.URLParam(r, "id")
+	if id == "" {
+		return nil, errors.New("id e um campo obrigatorio")
+	}
 
 	post, err := rp.PostUsecase.Get(&id)
 	if err != nil {
@@ -80,6 +94,27 @@ func Get(rp *RouterPost, r *http.Request) ([]byte, error) {
 	return postJson, nil
 }
 
-func Update(w http.ResponseWriter, r *http.Request) {
-	//TODO
+func Update(rp *RouterPost, r *http.Request) ([]byte, error) {
+	var dto usecase.PostUpdateDto
+
+	err := json.NewDecoder(r.Body).Decode(&dto)
+	if err != nil {
+		return nil, err
+	}
+
+	if dto.Id == "" {
+		return nil, errors.New("id e um campo obrigatorio")
+	}
+
+	post, err := rp.PostUsecase.Update(&dto)
+	if err != nil {
+		return nil, err
+	}
+
+	postJson, err := json.Marshal(post)
+	if err != nil {
+		panic(err)
+	}
+
+	return postJson, nil
 }

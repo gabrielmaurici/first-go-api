@@ -15,6 +15,22 @@ func NewPostDb(db *sql.DB) *PostDb {
 	}
 }
 
+func (p *PostDb) Save(post *entity.Post) error {
+	stmt, err := p.DB.Prepare("INSERT INTO posts(id, title, body) VALUES(?, ?, ?)")
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(post.Id, post.Title, post.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (p *PostDb) Get(id *string) (*entity.Post, error) {
 	post := &entity.Post{}
 
@@ -33,15 +49,15 @@ func (p *PostDb) Get(id *string) (*entity.Post, error) {
 	return post, nil
 }
 
-func (p *PostDb) Save(post *entity.Post) error {
-	stmt, err := p.DB.Prepare("INSERT INTO posts(id, title, body) VALUES(?, ?, ?)")
+func (p *PostDb) Update(post *entity.Post) error {
+	stmt, err := p.DB.Prepare("UPDATE posts SET title = ?, body = ? WHERE id = ?")
 	if err != nil {
 		return err
 	}
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(post.Id, post.Title, post.Body)
+	_, err = stmt.Exec(post.Title, post.Body, post.Id)
 	if err != nil {
 		return err
 	}

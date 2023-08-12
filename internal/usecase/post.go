@@ -10,6 +10,12 @@ type PostInputDto struct {
 	Body  string
 }
 
+type PostUpdateDto struct {
+	Id    string
+	Title string
+	Body  string
+}
+
 type PostUseCase struct {
 	PostGateway gateway.PostGateway
 }
@@ -20,7 +26,7 @@ func NewPostUseCase(postGateway gateway.PostGateway) *PostUseCase {
 	}
 }
 
-func (uc *PostUseCase) Create(input PostInputDto) error {
+func (uc *PostUseCase) Create(input *PostInputDto) error {
 	post, err := entity.NewPost(input.Title, input.Body)
 	if err != nil {
 		return err
@@ -36,6 +42,25 @@ func (uc *PostUseCase) Create(input PostInputDto) error {
 
 func (uc *PostUseCase) Get(id *string) (*entity.Post, error) {
 	post, err := uc.PostGateway.Get(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return post, nil
+}
+
+func (uc *PostUseCase) Update(input *PostUpdateDto) (*entity.Post, error) {
+	post, err := uc.PostGateway.Get(&input.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = post.UpdatePost(input.Title, input.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = uc.PostGateway.Update(post)
 	if err != nil {
 		return nil, err
 	}
