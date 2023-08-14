@@ -40,15 +40,6 @@ func (uc *PostUseCase) Create(input *PostInputDto) error {
 	return nil
 }
 
-func (uc *PostUseCase) Get(id *string) (*entity.Post, error) {
-	post, err := uc.PostGateway.Get(id)
-	if err != nil {
-		return nil, err
-	}
-
-	return post, nil
-}
-
 func (uc *PostUseCase) Update(input *PostUpdateDto) (*entity.Post, error) {
 	post, err := uc.PostGateway.Get(&input.Id)
 	if err != nil {
@@ -61,6 +52,32 @@ func (uc *PostUseCase) Update(input *PostUpdateDto) (*entity.Post, error) {
 	}
 
 	err = uc.PostGateway.Update(post)
+	if err != nil {
+		return nil, err
+	}
+
+	return post, nil
+}
+
+func (uc *PostUseCase) Get(id *string) (*entity.Post, error) {
+	post, err := uc.PostGateway.Get(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return post, nil
+}
+
+func (uc *PostUseCase) GetAll(offset *string, limit *string) ([]*entity.Post, error) {
+	if offset == nil {
+		*offset = "0"
+	}
+
+	if limit == nil {
+		*limit = "10"
+	}
+
+	post, err := uc.PostGateway.GetAll(offset, limit)
 	if err != nil {
 		return nil, err
 	}

@@ -31,6 +31,22 @@ func (p *PostDb) Save(post *entity.Post) error {
 	return nil
 }
 
+func (p *PostDb) Update(post *entity.Post) error {
+	stmt, err := p.DB.Prepare("UPDATE posts SET title = ?, body = ? WHERE id = ?")
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(post.Title, post.Body, post.Id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (p *PostDb) Get(id *string) (*entity.Post, error) {
 	post := &entity.Post{}
 
@@ -49,18 +65,35 @@ func (p *PostDb) Get(id *string) (*entity.Post, error) {
 	return post, nil
 }
 
-func (p *PostDb) Update(post *entity.Post) error {
-	stmt, err := p.DB.Prepare("UPDATE posts SET title = ?, body = ? WHERE id = ?")
+func (p *PostDb) GetAll(offset *string, limit *string) ([]*entity.Post, error) {
+	stmt, err := p.DB.Prepare("SELECT id, title, body from posts LIMIT ? OFFSET ?")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(post.Title, post.Body, post.Id)
+	rows, err := stmt.Query(limit, offset)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	var posts []*entity.Post
+
+	for rows.Next() {
+		var post entity.Post
+
+		err := rows.Scan(&post.Id, &post.Title, &post.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, &post)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return posts, nil
 }
