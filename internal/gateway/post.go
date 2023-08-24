@@ -7,4 +7,5 @@ type PostGateway interface {
 	Update(post *entity.Post) error
 	Get(id *string) (*entity.Post, error)
 	GetAll(offset *string, limit *string) ([]*entity.Post, error)
+	Delete(id *string) error
 }

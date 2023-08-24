@@ -50,7 +50,7 @@ func (p *PostDb) Update(post *entity.Post) error {
 func (p *PostDb) Get(id *string) (*entity.Post, error) {
 	post := &entity.Post{}
 
-	stmt, err := p.DB.Prepare("SELECT id, title, body from posts where id = ?")
+	stmt, err := p.DB.Prepare("SELECT id, title, body FROM posts WHERE id = ?")
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (p *PostDb) Get(id *string) (*entity.Post, error) {
 }
 
 func (p *PostDb) GetAll(offset *string, limit *string) ([]*entity.Post, error) {
-	stmt, err := p.DB.Prepare("SELECT id, title, body from posts LIMIT ? OFFSET ?")
+	stmt, err := p.DB.Prepare("SELECT id, title, body FROM posts LIMIT ? OFFSET ?")
 	if err != nil {
 		return nil, err
 	}
@@ -96,4 +96,20 @@ func (p *PostDb) GetAll(offset *string, limit *string) ([]*entity.Post, error) {
 	}
 
 	return posts, nil
+}
+
+func (p *PostDb) Delete(id *string) error {
+	stmt, err := p.DB.Prepare("DELETE FROM posts WHERE id = ?")
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -69,6 +69,16 @@ func (rp *RouterPost) AddHandlerPost() http.Handler {
 		w.Write(post)
 	})
 
+	r.Delete("/{id}", func(w http.ResponseWriter, r *http.Request) {
+		err := Delete(rp, r)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	})
+
 	return r
 }
 
@@ -150,4 +160,18 @@ func GetAll(rp *RouterPost, r *http.Request) ([]byte, error) {
 	}
 
 	return postsJson, nil
+}
+
+func Delete(rp *RouterPost, r *http.Request) error {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		return errors.New("id e um campo obrigatorio")
+	}
+
+	err := rp.PostUsecase.Delete(&id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

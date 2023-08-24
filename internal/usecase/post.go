@@ -84,3 +84,12 @@ func (uc *PostUseCase) GetAll(offset *string, limit *string) ([]*entity.Post, er
 
 	return post, nil
 }
+
+func (uc *PostUseCase) Delete(id *string) error {
+	err := uc.PostGateway.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

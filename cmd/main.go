@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("mysql", "gabras:gabras@tcp(127.0.0.1:3306)/gabras")
+	db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/gabras")
 	if err != nil {
 		panic(err)
 	}
